@@ -13,18 +13,30 @@ def get_metadata(id):
     for elm in html.xpath("//div[@id='metadata']/div/dd"):
         metadata_value.append(elm.text_content().replace("\n"," " ).strip())
     record = dict(zip(metadata_scheme, metadata_value))
-    print(record)
+    # print(record)
     return record
 
 idFile = open("idlist.txt", "r")
 idlist = idFile.readlines()
 idFile.close()
+schemeFile = open("keys.txt", "r")
+keylist = schemeFile.readlines()
+schemeFile.close()
+template = dict([(key.rstrip("\n"), []) for key in keylist])
 counter = 1
+rows = []
 for id in idlist:
+    formated = {}
+    formated.update(template)
+    # print(formated)
     record = get_metadata(id)
+    formated.update(record)
+    # print(formated)
+    rows.append(formated)
     print(str(counter) + '/' + str(len(idlist)))
     counter += 1
-    with open('md.csv','a', newline='') as mdcsv:
-        csvWriter = csv.DictWriter(mdcsv, record.keys())
-        csvWriter.writeheader()
-        csvWriter.writerow(record)
+
+with open('md.csv', 'a', newline='') as mdcsv:
+    csvWriter = csv.DictWriter(mdcsv, formated.keys())
+    csvWriter.writeheader()
+    csvWriter.writerows(rows)
