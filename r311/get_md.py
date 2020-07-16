@@ -2,6 +2,7 @@
 
 import requests
 import lxml.html
+from tqdm import tqdm
 import csv
 
 def get_ul(elm):
@@ -49,15 +50,16 @@ if __name__ == '__main__':
         keyslist = schemeFile.readlines()
         schemeFile.close()
         template = dict([(key.rstrip("\n"), []) for key in keyslist])
+        print("%s"%format)
         counter = 1
         rows = []
-        for id in idlist:
+        for id in tqdm(idlist):
             formated = {}
             formated.update(template)
             record = get_md(format, id)
             formated.update(record)
             rows.append(formated)
-            print("%s: "%format + str(counter) + "/" + str(len(idlist)))
+            # print("%s: "%format + str(counter) + "/" + str(len(idlist)))
             counter += 1
 
         with open('md.csv', 'a', newline='') as mdcsv:

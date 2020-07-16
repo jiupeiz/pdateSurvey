@@ -2,6 +2,7 @@
 
 import requests
 import lxml.html
+from tqdm import tqdm
 
 def get_keys(format, id):
     url = "https://recorder311.smt.jp/" + format.lower() + "/" + id
@@ -20,10 +21,11 @@ if __name__ == '__main__':
         idFile = open("idList%s.txt"%format, "r")
         idlist = idFile.readlines()
         idFile.close()
+        print("%s"%format)
         counter = 1
-        for id in idlist:
+        for id in tqdm(idlist):
             keys.extend(get_keys(format, id))
-            print("%s: "%format + str(counter) + "/" + str(len(idlist)))
+            # print("%s: "%format + str(counter) + "/" + str(len(idlist)))
             counter += 1
     with open("keys.txt", "a", newline="") as keylist:
         print("Total Metadata Items: ", len(set(keys)))
