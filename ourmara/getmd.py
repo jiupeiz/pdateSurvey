@@ -1,18 +1,28 @@
+#! /usr/bin/python3
 import requests
 import lxml.html
 import csv
+from tqdm import tqdm
 
 def get_metadata(id):
+    requests.packages.urllib3.util.ssl_.DEFAULT_CIPHERS = 'ALL:@SECLEVEL=1'
     url = "https://repository.library.northeastern.edu/files/" + str(id).strip()
     res = requests.get(url)
     html = lxml.html.fromstring(res.content)
-    metadata_scheme = []
-    for elm in html.xpath("//div[@id='metadata']/div/dt"):
-        metadata_scheme.append(elm.text_content().rstrip(':'))
-    metadata_value = []
-    for elm in html.xpath("//div[@id='metadata']/div/dd"):
-        metadata_value.append(elm.text_content().replace("\n"," " ).strip())
-    record = dict(zip(metadata_scheme, metadata_value))
+    ms = html.xpath("//div[@id='metadata']/div/dt")
+    tb = html.xpath("//div[@id='metadata']/div/dd")
+    scheme = []
+    value = []
+    index_range = len(ms)
+    index = 0
+    for index in range(index_range):
+        scheme.append(ms[index].text_content().rstrip(':'))
+    for index in range(index_range):
+        if ms[index].text_content().rstrip(':') == "Permanent URL":
+            value.append(tb[index].text_content())
+        else:
+            value.append(";".join(tb[index].xpath("text()")).replace("\n      ", " "))
+    record = dict(zip(scheme, value))
     # print(record)
     return record
 
@@ -23,9 +33,8 @@ schemeFile = open("keys.txt", "r")
 keylist = schemeFile.readlines()
 schemeFile.close()
 template = dict([(key.rstrip("\n"), []) for key in keylist])
-counter = 1
 rows = []
-for id in idlist:
+for id in tqdm(idlist):
     formated = {}
     formated.update(template)
     # print(formated)
@@ -33,8 +42,6 @@ for id in idlist:
     formated.update(record)
     # print(formated)
     rows.append(formated)
-    print(str(counter) + '/' + str(len(idlist)))
-    counter += 1
 
 with open('md.csv', 'a', newline='') as mdcsv:
     csvWriter = csv.DictWriter(mdcsv, formated.keys())

@@ -1,5 +1,7 @@
+#! /usr/bin/python3
 import requests
 import lxml.html
+from tqdm import tqdm
 # import csv
 
 def get_keys(id):
@@ -19,12 +21,9 @@ def get_keys(id):
 idFile = open("idlist.txt", "r")
 idlist = idFile.readlines()
 idFile.close()
-counter = 1
 keys = []
-for id in idlist:
+for id in tqdm(idlist):
     keys = keys + get_keys(id)
-    print(str(counter) + '/' + str(len(idlist)))
-    counter += 1
 with open('keys.txt','a', newline='') as keylist:
     print('Total Metadata Items: ', len(set(keys)))
     for item in list(set(keys)):

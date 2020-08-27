@@ -1,6 +1,8 @@
+#! /usr/bin/python3
 import urllib.request
 import urllib.parse
 import re
+from tqdm import tqdm
 
 browse_url = 'https://marathon.library.northeastern.edu/browse/'
 ajax_url = 'https://marathon.library.northeastern.edu/wp-admin/admin-ajax.php'
@@ -9,7 +11,7 @@ browse_req = urllib.request.Request(browse_url, headers={"User-Agent": "Mozilla/
 browse_body = urllib.request.urlopen(browse_req).read()
 nonce = re.search(r'"nonce":"(\w+)"', str(browse_body)).group(1)
 idList = []
-for page in range(1,159):
+for page in tqdm(range(1,159)):
     data = urllib.parse.urlencode(
         {
             '_ajax_nonce': nonce,
