@@ -35,7 +35,7 @@ def get_md(format, id):
         if key == 'さんかしゃ' or key == 'キーワード':
             value.append(get_ul(elm))
         else:
-            value.append(elm[1].text_content())
+            value.append(elm[1].text_content().rstrip("\n").strip('"'))
     
     record.update(dict(zip(scheme, value)))
 
